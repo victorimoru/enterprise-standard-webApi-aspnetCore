@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Shared.Infrastructure.PagingHelper
 {
-    class PagingMetadata
+    public class PagingMetadata
     {
         public int CurrentPage { get; set; }
         public int TotalPages { get; set; }
