@@ -1,4 +1,4 @@
-﻿namespace DatingApp.DAL.Entities
+﻿namespace Shared.Infrastructure.Entities
 {
     public enum Gender 
     {

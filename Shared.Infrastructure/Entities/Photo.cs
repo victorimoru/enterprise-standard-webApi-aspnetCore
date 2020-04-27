@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace DatingApp.DAL.Entities
+namespace Shared.Infrastructure.Entities
 {
     public class Photo
     {
@@ -13,6 +11,7 @@ namespace DatingApp.DAL.Entities
         public bool IsMain { get; set; }
         public User User { get; set; }
         public int UserId { get; set; }
+ 
 
     }
 }

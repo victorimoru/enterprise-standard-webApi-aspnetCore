@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 
-namespace DatingApp.DAL.Entities
+namespace Shared.Infrastructure.Entities
 {
     public class User
     {
@@ -24,7 +24,7 @@ namespace DatingApp.DAL.Entities
         public string LookingFor { get; set; }
         public string City { get; set; }
         public string Country { get; set; }
-        public virtual ICollection<Photo> PhotoSet { get; set; }
+        public ICollection<Photo> PhotoSet { get; set; } = new HashSet<Photo>();
 
 
 
