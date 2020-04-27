@@ -17,6 +17,12 @@ namespace Shared.Infrastructure.Repository
             this.ctx = ctx;
         }
         public DataContext GetDataContext => this.dataContext as DataContext;
+
+        public void CreateUser(User user)
+        {
+            GetDataContext.Add(user);
+        }
+
         public async Task<User> GetUserAsync(string username)
         {
             var user = await FindByCondition(u => u.Username == username).SingleAsync();

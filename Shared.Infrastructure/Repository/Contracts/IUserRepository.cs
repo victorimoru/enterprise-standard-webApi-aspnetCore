@@ -11,5 +11,7 @@ namespace Shared.Infrastructure.Repository
         Task<User> GetUserAsync(string username);
         bool UserExist(string username);
         Task<IEnumerable<User>> GetUsersAsync();
+        void CreateUser(User user);
+       
     }
 }
