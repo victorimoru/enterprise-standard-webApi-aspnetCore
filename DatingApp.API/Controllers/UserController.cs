@@ -7,6 +7,7 @@ using DatingApp.Core.ServiceContracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Shared.Infrastructure.Filters;
 using Shared.Infrastructure.LoggingHandler;
 using Shared.Infrastructure.PagingHelper;
 
@@ -14,6 +15,7 @@ namespace DatingApp.API.Controllers
 {   
     [Route("api/[controller]")]
     [ApiController]
+    [CheckPermission]
     public class UsersController : ControllerBase
     {
         private readonly IUserService userService;
@@ -40,7 +42,7 @@ namespace DatingApp.API.Controllers
             return Ok(userDetails);
 
         }
-
+        [UsersResultFilter]
         [HttpGet("all")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<UserListDto>))]
