@@ -1,8 +1,8 @@
-﻿using DatingApp.Core.ServiceContracts;
+﻿using DatingApp.Core.Mapper;
+using DatingApp.Core.ServiceContracts;
 using DatingApp.Core.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace DatingApp.Core
 {
@@ -12,6 +12,8 @@ namespace DatingApp.Core
         {
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<ICustomMapper, CustomMapper>();
+          
             return services;
         }
     }

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Infrastructure.DatabaseConnection;
@@ -13,6 +14,7 @@ namespace Shared.Infrastructure
         {
             services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
             services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
+       
             services.AddDbContext<DataContext>(opts =>
               opts.UseSqlServer(configuration.GetConnectionString("sqlConnection")));
             return services;

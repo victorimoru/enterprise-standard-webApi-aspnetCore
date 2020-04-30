@@ -1,5 +1,6 @@
 ﻿using DatingApp.Core.DTOs;
 using DatingApp.Core.Extensions;
+using DatingApp.Core.Mapper;
 using DatingApp.Core.ServiceContracts;
 using Shared.Infrastructure.Entities;
 using Shared.Infrastructure.PagingHelper;
@@ -14,9 +15,12 @@ namespace DatingApp.Core.Services
     public class UserService : IUserService
     {
         private readonly IRepositoryWrapper repositoryWrapper;
-        public UserService(IRepositoryWrapper repositoryWrapper)
+        private readonly ICustomMapper customMapper;
+
+        public UserService(IRepositoryWrapper repositoryWrapper, ICustomMapper customMapper)
         {
             this.repositoryWrapper = repositoryWrapper;
+            this.customMapper = customMapper;
         }
         public Task<(IEnumerable<UserListDto>, PagingMetadata)> GetAllUsersAsync(UserQueryParameters userQueryParameters)
         {
@@ -26,21 +30,8 @@ namespace DatingApp.Core.Services
         public async Task<IEnumerable<UserListDto>> GetAllUsersAsync()
         {
             var userCollection = await repositoryWrapper.User.GetUsersAsync();
-            var result = (from u in userCollection
-                          select new UserListDto
-                          {
-                              Id = u.Id,
-                              Username = u.Username,
-                              Age = u.DateOfBirth.CalculateAge(),
-                              KnownAs = u.KnownAs,
-                              LastActive = u.LastActive,
-                              City = u.City,
-                              Country = u.Country,
-                              Gender = u.Gender == Gender.Male ? "Male" : "Female",
-                              photoUrl = u.PhotoSet.FirstOrDefault(x => x.IsMain).Url
-                          }).OrderBy(a => a.Id).ToList();
+            return customMapper.MapToUserListDto(userCollection);
 
-            return result;
         }
 
         public Task<UserDetailsDto> GetUserDetailsAsync(int id)

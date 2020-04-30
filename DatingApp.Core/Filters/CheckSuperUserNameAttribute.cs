@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Shared.Infrastructure.Filters
+namespace DatingApp.Core.Filters
 {
     public class CheckPermissionAttribute : ActionFilterAttribute
     {
