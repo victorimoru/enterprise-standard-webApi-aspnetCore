@@ -9,5 +9,6 @@ namespace DatingApp.Core.Mapper
     public interface ICustomMapper
     {
         IEnumerable<UserListDto> MapToUserListDto(IEnumerable<User> users);
+        UserDetailsDto MapToUserDetailsDto(User user);
     }
 }

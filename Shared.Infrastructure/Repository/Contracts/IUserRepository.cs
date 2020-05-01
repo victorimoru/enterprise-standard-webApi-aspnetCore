@@ -9,6 +9,7 @@ namespace Shared.Infrastructure.Repository
     {
         PagedList<User> GetUsersAsync(UserQueryParameters userQueryParameters);
         Task<User> GetUserAsync(string username);
+        Task<User> GetUserAsync(int id);
         bool UserExist(string username);
         Task<IEnumerable<User>> GetUsersAsync();
         void CreateUser(User user);

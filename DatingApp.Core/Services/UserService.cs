@@ -34,9 +34,11 @@ namespace DatingApp.Core.Services
 
         }
 
-        public Task<UserDetailsDto> GetUserDetailsAsync(int id)
+        public async Task<UserDetailsDto> GetUserDetailsAsync(int id)
         {
-            throw new NotImplementedException();
+            var user = await repositoryWrapper.User.GetUserAsync(id);
+            return customMapper.MapToUserDetailsDto(user);
+
         }
     }
 }
