@@ -42,13 +42,13 @@ namespace DatingApp.API.Controllers
         }
    
         [HttpGet("all")]
-        [Produces("application/json")]
+        [Produces("application/json", "application/xml")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<UserListDto>))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         
         public async Task<IActionResult> GetAsync()
         {
-            var users = await userService.GetAllUsersAsync();
+            var users = await  userService.GetAllUsersAsync();
             if (users == null)
                 return BadRequest(new { message = "No user" });
             return Ok(users);

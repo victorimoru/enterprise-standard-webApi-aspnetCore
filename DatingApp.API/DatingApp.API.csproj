@@ -25,6 +25,7 @@
     <ProjectReference Include="..\DatingApp.DAL\DatingApp.DAL.csproj" />
     <ProjectReference Include="..\Shared.GlobalErrorHandler\Shared.GlobalErrorHandler.csproj" />
     <ProjectReference Include="..\Shared.Infrastructure\Shared.Infrastructure.csproj" />
+    <ProjectReference Include="..\Shared.Utility\Shared.Utility.csproj" />
   </ItemGroup>
 
 

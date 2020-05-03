@@ -17,7 +17,7 @@ namespace DatingApp.Core.Filters
                     Title = "Invalid Header/BadRequest",
                     Code = (int)HttpStatusCode.BadRequest,
                     Details = "checkPermission NOT found in the request header OR wrong value"
-                }, Formatting.Indented);
+                });
                 context.Result = new BadRequestObjectResult(result);
             };
         }

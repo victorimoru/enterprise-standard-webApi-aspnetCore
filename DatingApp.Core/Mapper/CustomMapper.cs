@@ -3,11 +3,18 @@ using DatingApp.Core.Extensions;
 using Shared.Infrastructure.Entities;
 using System.Collections.Generic;
 using System.Linq;
+using Shared.Utility.Security;
 
 namespace DatingApp.Core.Mapper
 {
     class CustomMapper : ICustomMapper
     {
+        private readonly IAesCryptoEngine aesCryptoEngine;
+
+        public CustomMapper(IAesCryptoEngine aesCryptoEngine)
+        {
+            this.aesCryptoEngine = aesCryptoEngine;
+        }
         public UserDetailsDto MapToUserDetailsDto(User u)
         {
             var result = new UserDetailsDto
@@ -17,7 +24,7 @@ namespace DatingApp.Core.Mapper
                 Age = u.DateOfBirth.CalculateAge(),
                 Created = u.Created.ToShortDateString(),
                 Introduction = u.Introduction,
-                KnownAs = u.KnownAs,
+                KnownAs = aesCryptoEngine.Encrypt(u.KnownAs),
                 LastActive = u.LastActive,
                 City = u.City,
                 Country = u.Country,
@@ -45,7 +52,7 @@ namespace DatingApp.Core.Mapper
                               KnownAs = u.KnownAs,
                               LastActive = u.LastActive,
                               City = u.City,
-                              Country = u.Country,
+                              Country = aesCryptoEngine.Encrypt(u.Country),
                               Gender = u.Gender == Gender.Male ? "Male" : "Female",
                               photoUrl = u.PhotoSet.FirstOrDefault(x => x.IsMain).Url
                           }).OrderBy(a => a.Id).ToList();

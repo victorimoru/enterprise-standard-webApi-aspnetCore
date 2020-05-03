@@ -28,7 +28,7 @@ namespace Shared.Infrastructure.Repository
             var user = await FindByCondition(u => u.Username == username).Include(p => p.PhotoSet).SingleAsync();
             return user;
         }
-        public async Task<User> GetUserAsync(int id)
+        public async Task<User> GetUserByIDAsync(int id)
         {
             var user = await FindByCondition(u => u.Id == id).Include(p=> p.PhotoSet).SingleAsync();
             return user;

@@ -24,19 +24,7 @@ namespace DatingApp.Core.Services
         public async Task<(IEnumerable<UserListDto>, PagingMetadata)> GetAllUsersAsync(UserQueryParameters userQueryParameters)
         {
             var userCollection = await repositoryWrapper.User.GetUsersAsync(userQueryParameters);
-            var result = (from u in userCollection
-                          select new UserListDto
-                          {
-                              Id = u.Id,
-                              Username = u.Username,
-                              Age = u.DateOfBirth.CalculateAge(),
-                              KnownAs = u.KnownAs,
-                              LastActive = u.LastActive,
-                              City = u.City,
-                              Country = u.Country,
-                              Gender = u.Gender == Gender.Male ? "Male" : "Female",
-                              photoUrl = u.PhotoSet.FirstOrDefault(x => x.IsMain).Url
-                          }).ToList();
+            var result = customMapper.MapToUserListDto(userCollection);
 
             var metadata = new PagingMetadata
             {
@@ -52,6 +40,7 @@ namespace DatingApp.Core.Services
 
         public async Task<IEnumerable<UserListDto>> GetAllUsersAsync()
         {
+            
             var userCollection = await repositoryWrapper.User.GetUsersAsync();
             return customMapper.MapToUserListDto(userCollection);
 
@@ -59,7 +48,7 @@ namespace DatingApp.Core.Services
 
         public async Task<UserDetailsDto> GetUserDetailsAsync(int id)
         {
-            var user = await repositoryWrapper.User.GetUserAsync(id);
+            var user = await repositoryWrapper.User.GetUserByIDAsync(id);
             return customMapper.MapToUserDetailsDto(user);
 
         }

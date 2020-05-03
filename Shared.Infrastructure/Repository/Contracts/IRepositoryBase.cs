@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -11,5 +12,6 @@ namespace Shared.Infrastructure.Repository
         void Create(T entity);
         void Update(T entity);
         void Delete(T entity);
+    
     }
 }
