@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Newtonsoft.Json;
+using System.Net;
 
 namespace DatingApp.Core.Filters
 {
@@ -10,7 +12,13 @@ namespace DatingApp.Core.Filters
             var headerValue = context.HttpContext.Request.Headers["permission"];
             if (!headerValue.Equals("Si3plePassw0rd"))
             {
-                context.Result = new BadRequestObjectResult("Invalid permission Header");
+                var result = Newtonsoft.Json.JsonConvert.SerializeObject(new
+                {
+                    Title = "Invalid Header/BadRequest",
+                    Code = (int)HttpStatusCode.BadRequest,
+                    Details = "checkPermission NOT found in the request header OR wrong value"
+                }, Formatting.Indented);
+                context.Result = new BadRequestObjectResult(result);
             };
         }
 

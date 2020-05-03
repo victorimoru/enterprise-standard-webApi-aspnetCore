@@ -34,7 +34,7 @@ namespace Shared.Infrastructure.Repository
             return user;
         }
 
-        public PagedList<User> GetUsersAsync(UserQueryParameters userQueryParameters)
+        public async Task<PagedList<User>> GetUsersAsync(UserQueryParameters userQueryParameters)
         {
             var query = FindAll().Include(p => p.PhotoSet);
             if ((string.IsNullOrEmpty(userQueryParameters.OrderBy) && userQueryParameters.OrderBy.ToLowerInvariant().Equals("username")))
@@ -42,7 +42,7 @@ namespace Shared.Infrastructure.Repository
                 query.OrderBy(x => x.Username);
             }
 
-            return PagedList<User>.Create(query, userQueryParameters.PageNumber, userQueryParameters.PageSize);
+            return await PagedList<User>.CreateAsync(query, userQueryParameters.PageNumber, userQueryParameters.PageSize);
         }
 
         public async Task<IEnumerable<User>> GetUsersAsync()
@@ -52,5 +52,23 @@ namespace Shared.Infrastructure.Repository
         }
 
         public bool UserExist(string username) => FindAll().Any(u => u.Username == username);
+
+        /// <summary>
+        /// Check if User table in the database is empty. 
+        ///
+        /// </summary>
+        /// <returns></returns>
+        public async Task<string> VerifyAsync()
+        {
+            var  isUserTableEmpty = await FindAll().AnyAsync();
+            if (isUserTableEmpty == false)
+            {
+                return "00";
+            }
+            else
+            {
+                return "22";
+            }
+        }
     }
 }
