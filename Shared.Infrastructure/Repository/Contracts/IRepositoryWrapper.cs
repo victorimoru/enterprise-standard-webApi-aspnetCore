@@ -8,6 +8,6 @@ namespace Shared.Infrastructure.Repository
     public interface IRepositoryWrapper
     {
         IUserRepository User { get; }
-        Task Complete();
+        Task<(string errorMsg, bool transactionStatus)> Complete();
     }
 }

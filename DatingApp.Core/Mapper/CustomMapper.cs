@@ -24,7 +24,7 @@ namespace DatingApp.Core.Mapper
                 Age = u.DateOfBirth.CalculateAge(),
                 Created = u.Created.ToShortDateString(),
                 Introduction = u.Introduction,
-                KnownAs = aesCryptoEngine.Encrypt(u.KnownAs),
+                KnownAs = u.KnownAs,
                 LastActive = u.LastActive,
                 City = u.City,
                 Country = u.Country,
@@ -52,13 +52,25 @@ namespace DatingApp.Core.Mapper
                               KnownAs = u.KnownAs,
                               LastActive = u.LastActive,
                               City = u.City,
-                              Country = aesCryptoEngine.Encrypt(u.Country),
+                              Country = u.Country,
                               Gender = u.Gender == Gender.Male ? "Male" : "Female",
                               photoUrl = u.PhotoSet.FirstOrDefault(x => x.IsMain).Url
                           }).OrderBy(a => a.Id).ToList();
 
             return result;
         }
+
+        public User MapUserForUpdateDtoToUser(UserForUpdateDto userForUpdateDto, User user)
+        {
+            user.Introduction = userForUpdateDto.Introduction;
+            user.LookingFor = userForUpdateDto.LookingFor;
+            user.City = userForUpdateDto.City;
+            user.Country = userForUpdateDto.Country;
+            // user.Interest = userForUpdateDto.Country;
+            return user;
+        }
+
+       
     }
     
 }

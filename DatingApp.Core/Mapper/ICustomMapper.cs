@@ -10,5 +10,7 @@ namespace DatingApp.Core.Mapper
     {
         IEnumerable<UserListDto> MapToUserListDto(IEnumerable<User> users);
         UserDetailsDto MapToUserDetailsDto(User user);
+        User MapUserForUpdateDtoToUser(UserForUpdateDto userForUpdateDto, User user);
+
     }
 }

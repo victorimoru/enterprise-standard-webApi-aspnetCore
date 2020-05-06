@@ -3,6 +3,7 @@ using DatingApp.Core.Extensions;
 using DatingApp.Core.Mapper;
 using DatingApp.Core.ServiceContracts;
 using Shared.Infrastructure.Entities;
+using Shared.Infrastructure.LoggingHandler;
 using Shared.Infrastructure.PagingHelper;
 using Shared.Infrastructure.Repository;
 using System.Collections.Generic;
@@ -20,6 +21,7 @@ namespace DatingApp.Core.Services
         {
             this.repositoryWrapper = repositoryWrapper;
             this.customMapper = customMapper;
+       
         }
         public async Task<(IEnumerable<UserListDto>, PagingMetadata)> GetAllUsersAsync(UserQueryParameters userQueryParameters)
         {
@@ -46,11 +48,30 @@ namespace DatingApp.Core.Services
 
         }
 
+        public Task<User> GetUserByIDAsync(int id, bool includePhoto = true)
+        {
+            var userInDB = repositoryWrapper.User.GetUserByIDAsync(id, includePhoto);
+            return userInDB;
+        }
+
+        public Task GetUserByIDAsync()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public async Task<UserDetailsDto> GetUserDetailsAsync(int id)
         {
             var user = await repositoryWrapper.User.GetUserByIDAsync(id);
-            return customMapper.MapToUserDetailsDto(user);
+            
+            return (user == null) ? null : customMapper.MapToUserDetailsDto(user);
 
+        }
+
+        public async Task<(string errorMsg, bool transactionStatus)> UpdateUserAsync(UserForUpdateDto userForUpdateDto, User user)
+        {
+            repositoryWrapper.User.UpdateUser(customMapper.MapUserForUpdateDtoToUser(userForUpdateDto, user));
+            var result = await repositoryWrapper.Complete();
+            return result;
         }
     }
 }

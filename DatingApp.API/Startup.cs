@@ -56,6 +56,14 @@ namespace DatingApp.API
             
             });
             services.AddControllers().AddXmlDataContractSerializerFormatters();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("MyCustomPolicy", opt =>
+                {
+                    opt.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                });
+            });
             services
                 .AddInfrastructure(Configuration)
                 .AddBusinessServices(Configuration)
@@ -88,6 +96,8 @@ namespace DatingApp.API
             });
 
             // app.UseStaticFiles();
+
+            app.UseCors("MyCustomPolicy");
 
              app.UseRouting();
     

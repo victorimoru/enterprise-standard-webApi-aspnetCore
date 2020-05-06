@@ -22,16 +22,29 @@ namespace Shared.Infrastructure.Repository
         {
             GetDataContext.Add(user);
         }
+        public void UpdateUser(User user)
+        {
+            GetDataContext.Update(user);
+        }
 
         public async Task<User> GetUserAsync(string username)
         {
-            var user = await FindByCondition(u => u.Username == username).Include(p => p.PhotoSet).SingleAsync();
+            var user = await FindByCondition(u => u.Username == username).Include(p => p.PhotoSet).SingleOrDefaultAsync();
             return user;
         }
-        public async Task<User> GetUserByIDAsync(int id)
+        public async Task<User> GetUserByIDAsync(int id, bool includePhoto = true)
         {
-            var user = await FindByCondition(u => u.Id == id).Include(p=> p.PhotoSet).SingleAsync();
-            return user;
+           if(includePhoto)
+            {
+                var user = await FindByCondition(u => u.Id == id).Include(p => p.PhotoSet).SingleOrDefaultAsync();
+                return user;
+            }
+           else 
+            {
+                var user = await FindByCondition(u => u.Id == id).SingleOrDefaultAsync();
+                return user;
+            }
+            
         }
 
         public async Task<PagedList<User>> GetUsersAsync(UserQueryParameters userQueryParameters)
