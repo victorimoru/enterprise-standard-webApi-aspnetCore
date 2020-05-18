@@ -3,6 +3,7 @@ using DatingApp.Core.Extensions;
 using DatingApp.Core.Mapper;
 using DatingApp.Core.ServiceContracts;
 using Shared.Infrastructure.Entities;
+using Shared.Infrastructure.LoggingHandler;
 using Shared.Infrastructure.PagingHelper;
 using Shared.Infrastructure.Repository;
 using System.Collections.Generic;
@@ -20,23 +21,12 @@ namespace DatingApp.Core.Services
         {
             this.repositoryWrapper = repositoryWrapper;
             this.customMapper = customMapper;
+       
         }
         public async Task<(IEnumerable<UserListDto>, PagingMetadata)> GetAllUsersAsync(UserQueryParameters userQueryParameters)
         {
             var userCollection = await repositoryWrapper.User.GetUsersAsync(userQueryParameters);
-            var result = (from u in userCollection
-                          select new UserListDto
-                          {
-                              Id = u.Id,
-                              Username = u.Username,
-                              Age = u.DateOfBirth.CalculateAge(),
-                              KnownAs = u.KnownAs,
-                              LastActive = u.LastActive,
-                              City = u.City,
-                              Country = u.Country,
-                              Gender = u.Gender == Gender.Male ? "Male" : "Female",
-                              photoUrl = u.PhotoSet.FirstOrDefault(x => x.IsMain).Url
-                          }).ToList();
+            var result = customMapper.MapToUserListDto(userCollection);
 
             var metadata = new PagingMetadata
             {
@@ -52,16 +42,36 @@ namespace DatingApp.Core.Services
 
         public async Task<IEnumerable<UserListDto>> GetAllUsersAsync()
         {
+            
             var userCollection = await repositoryWrapper.User.GetUsersAsync();
             return customMapper.MapToUserListDto(userCollection);
 
         }
 
+        public Task<User> GetUserByIDAsync(int id, bool includePhoto = true)
+        {
+            var userInDB = repositoryWrapper.User.GetUserByIDAsync(id, includePhoto);
+            return userInDB;
+        }
+
+        public Task GetUserByIDAsync()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public async Task<UserDetailsDto> GetUserDetailsAsync(int id)
         {
-            var user = await repositoryWrapper.User.GetUserAsync(id);
-            return customMapper.MapToUserDetailsDto(user);
+            var user = await repositoryWrapper.User.GetUserByIDAsync(id);
+            
+            return (user == null) ? null : customMapper.MapToUserDetailsDto(user);
 
+        }
+
+        public async Task<(string errorMsg, bool transactionStatus)> UpdateUserAsync(UserForUpdateDto userForUpdateDto, User user)
+        {
+            repositoryWrapper.User.UpdateUser(customMapper.MapUserForUpdateDtoToUser(userForUpdateDto, user));
+            var result = await repositoryWrapper.Complete();
+            return result;
         }
     }
 }

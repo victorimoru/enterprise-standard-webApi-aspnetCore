@@ -8,6 +8,7 @@ using Microsoft.OpenApi.Models;
 using Shared.GlobalErrorHandler.Utility;
 using Shared.Infrastructure;
 using Shared.Infrastructure.LoggingHandler;
+using Shared.Utility;
 using System;
 using System.IO;
 using System.Reflection;
@@ -54,11 +55,21 @@ namespace DatingApp.API
                       options.IncludeXmlComments(xmlPath);
             
             });
-            services.AddControllers();
+            services.AddControllers().AddXmlDataContractSerializerFormatters();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("MyCustomPolicy", opt =>
+                {
+                    opt.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                });
+            });
             services
                 .AddInfrastructure(Configuration)
                 .AddBusinessServices(Configuration)
-            .ConfigureLoggerService();
+                .AddSecurityInfrastructure(Configuration)
+                .ConfigureLoggerService();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -85,6 +96,8 @@ namespace DatingApp.API
             });
 
             // app.UseStaticFiles();
+
+            app.UseCors("MyCustomPolicy");
 
              app.UseRouting();
     

@@ -1,4 +1,5 @@
 ﻿using DatingApp.Core.DTOs;
+using Shared.Infrastructure.Entities;
 using Shared.Infrastructure.PagingHelper;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,9 @@ namespace DatingApp.Core.ServiceContracts
     {
         Task<(IEnumerable<UserListDto>, PagingMetadata)> GetAllUsersAsync(UserQueryParameters userQueryParameters);
         Task<IEnumerable<UserListDto>> GetAllUsersAsync();
-
+        Task<User> GetUserByIDAsync(int id, bool includePhoto = true);
         Task<UserDetailsDto> GetUserDetailsAsync(int id);
+        Task GetUserByIDAsync();
+        Task<(string errorMsg, bool transactionStatus)> UpdateUserAsync(UserForUpdateDto userForUpdateDto, User user);
     }
 }

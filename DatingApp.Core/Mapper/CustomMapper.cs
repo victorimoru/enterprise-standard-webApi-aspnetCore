@@ -3,11 +3,18 @@ using DatingApp.Core.Extensions;
 using Shared.Infrastructure.Entities;
 using System.Collections.Generic;
 using System.Linq;
+using Shared.Utility.Security;
 
 namespace DatingApp.Core.Mapper
 {
     class CustomMapper : ICustomMapper
     {
+        private readonly IAesCryptoEngine aesCryptoEngine;
+
+        public CustomMapper(IAesCryptoEngine aesCryptoEngine)
+        {
+            this.aesCryptoEngine = aesCryptoEngine;
+        }
         public UserDetailsDto MapToUserDetailsDto(User u)
         {
             var result = new UserDetailsDto
@@ -52,6 +59,18 @@ namespace DatingApp.Core.Mapper
 
             return result;
         }
+
+        public User MapUserForUpdateDtoToUser(UserForUpdateDto userForUpdateDto, User user)
+        {
+            user.Introduction = userForUpdateDto.Introduction;
+            user.LookingFor = userForUpdateDto.LookingFor;
+            user.City = userForUpdateDto.City;
+            user.Country = userForUpdateDto.Country;
+            // user.Interest = userForUpdateDto.Country;
+            return user;
+        }
+
+       
     }
     
 }

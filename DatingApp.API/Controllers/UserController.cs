@@ -3,10 +3,12 @@ using DatingApp.Core.Filters;
 using DatingApp.Core.ServiceContracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Newtonsoft.Json;
 using Shared.Infrastructure.LoggingHandler;
 using Shared.Infrastructure.PagingHelper;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace DatingApp.API.Controllers
@@ -28,24 +30,25 @@ namespace DatingApp.API.Controllers
 
         [HttpGet("detail/{id:int}")]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type =typeof(UserDetailsDto))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserDetailsDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
 
         [Consumes("application/json")]
         public async Task<IActionResult> GetAsync(int id)
         {
+         
             var userDetails = await userService.GetUserDetailsAsync(id);
             if (userDetails == null)
                 return BadRequest(new { message = "Error: User does not exist " });
             return Ok(userDetails);
 
         }
-   
+
         [HttpGet("all")]
-        [Produces("application/json")]
+        [Produces("application/json", "application/xml")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<UserListDto>))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        
+
         public async Task<IActionResult> GetAsync()
         {
             var users = await userService.GetAllUsersAsync();
@@ -69,6 +72,23 @@ namespace DatingApp.API.Controllers
             HttpContext.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.data));
             return Ok(result.userLists);
 
+        }
+
+        [HttpPost("update/{id:int}")]
+        public async Task<IActionResult> UpdateUserAsync(int id, [FromBody]UserForUpdateDto userForUpdateDto)
+        {
+            var userInDB = await userService.GetUserByIDAsync(id, false);
+            if(userInDB == null) return BadRequest(new { message = "Error: User does not exist " });
+            var result = await userService.UpdateUserAsync(userForUpdateDto, userInDB);
+            if(result.transactionStatus == false)
+            {
+                ModelState.AddModelError("UpdateError", "Updating user {id} failed on save");
+                return BadRequest(ModelState);
+            }
+            else
+            {
+                return NoContent();
+            }
         }
     }
 }

@@ -9,10 +9,12 @@ namespace Shared.Infrastructure.Repository
     {
         Task<PagedList<User>> GetUsersAsync(UserQueryParameters userQueryParameters);
         Task<User> GetUserAsync(string username);
-        Task<User> GetUserAsync(int id);
+        Task<User> GetUserByIDAsync(int id, bool includePhoto = true);
         bool UserExist(string username);
         Task<IEnumerable<User>> GetUsersAsync();
         void CreateUser(User user);
+        void UpdateUser(User user);
+
         Task<string> VerifyAsync();
     }
 }

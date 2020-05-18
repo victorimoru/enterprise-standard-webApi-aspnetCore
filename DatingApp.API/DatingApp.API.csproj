@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CloudinaryDotNet" Version="1.10.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -25,6 +26,7 @@
     <ProjectReference Include="..\DatingApp.DAL\DatingApp.DAL.csproj" />
     <ProjectReference Include="..\Shared.GlobalErrorHandler\Shared.GlobalErrorHandler.csproj" />
     <ProjectReference Include="..\Shared.Infrastructure\Shared.Infrastructure.csproj" />
+    <ProjectReference Include="..\Shared.Utility\Shared.Utility.csproj" />
   </ItemGroup>
 
 
