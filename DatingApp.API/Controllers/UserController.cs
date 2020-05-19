@@ -1,20 +1,22 @@
 ﻿using DatingApp.Core.DTOs;
 using DatingApp.Core.Filters;
 using DatingApp.Core.ServiceContracts;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Newtonsoft.Json;
 using Shared.Infrastructure.LoggingHandler;
 using Shared.Infrastructure.PagingHelper;
 using System.Collections.Generic;
-using System.Security.Claims;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DatingApp.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [CheckPermission]
     public class UsersController : ControllerBase
     {
@@ -51,9 +53,14 @@ namespace DatingApp.API.Controllers
 
         public async Task<IActionResult> GetAsync()
         {
+            var response = HttpContext.ValidateUserWithJWTClaim();
+            if (response.errorMsg != null) return Unauthorized(new { message = "Invalid Token" });
+            return Ok(new { Id = response.id, Gender = response.Gender });
+
             var users = await userService.GetAllUsersAsync();
             if (users == null)
                 return BadRequest(new { message = "No user" });
+            HttpContext.Response.Headers.Add("X-Total-Count", users.Count().ToString());
             return Ok(users);
 
         }
@@ -70,6 +77,8 @@ namespace DatingApp.API.Controllers
             if (result.userLists == null)
                 return BadRequest(new { message = "No user" });
             HttpContext.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.data));
+            HttpContext.Response.Headers.Add("X-Total-Count", result.data.TotalCount.ToString());
+
             return Ok(result.userLists);
 
         }

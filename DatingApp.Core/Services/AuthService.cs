@@ -43,8 +43,9 @@ namespace DatingApp.Core.Services
         {
             var claims = new[]
                         {
-                new Claim(ClaimTypes.Name, user.Id.ToString()),
+                new Claim("Id", user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Username),
+                new Claim("Gender", user.Gender == Gender.Male ? "Male" : "Female"),
                 new Claim(ClaimTypes.Role, "SysAdmin"),
             };
 

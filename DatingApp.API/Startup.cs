@@ -1,9 +1,12 @@
 using DatingApp.Core;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Shared.GlobalErrorHandler.Utility;
 using Shared.Infrastructure;
@@ -12,6 +15,7 @@ using Shared.Utility;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Text;
 
 namespace DatingApp.API
 {
@@ -64,6 +68,24 @@ namespace DatingApp.API
                     opt.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
                 });
             });
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+            }).AddJwtBearer(cfg => {
+                cfg.RequireHttpsMetadata = false;
+                cfg.SaveToken = true;
+                cfg.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+                {
+                    IssuerSigningKey =  new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
+                    ValidateAudience = false,
+                    ValidateIssuer = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true
+                };
+            }); 
             services
                 .AddInfrastructure(Configuration)
                 .AddBusinessServices(Configuration)
@@ -98,6 +120,8 @@ namespace DatingApp.API
             // app.UseStaticFiles();
 
             app.UseCors("MyCustomPolicy");
+
+            app.UseAuthentication();
 
              app.UseRouting();
     
