@@ -6,10 +6,11 @@ namespace Shared.Infrastructure.PagingHelper
 {
    public abstract class QueryStringParameters
     {
-        const int maxPageSize = 19;
-        private int pageSize { get; set; } = 5;
+        const int maxPageSize = 20;
+        private int pageSize { get; set; } = 8;
         public int PageNumber { get; set; } = 1;
-        public string OrderBy { get; set; }
+        
+
 
 
         public int PageSize

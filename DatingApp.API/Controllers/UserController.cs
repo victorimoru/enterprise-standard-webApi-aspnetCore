@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Shared.Infrastructure.Entities;
 using Shared.Infrastructure.LoggingHandler;
 using Shared.Infrastructure.PagingHelper;
 using System.Collections.Generic;
@@ -46,17 +47,17 @@ namespace DatingApp.API.Controllers
 
         }
 
+        
+      
         [HttpGet("all")]
         [Produces("application/json", "application/xml")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<UserListDto>))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
 
-        public async Task<IActionResult> GetAsync()
+        public async Task<IActionResult> GetAsync([FromQuery] bool exclude = false)
         {
             var response = HttpContext.ValidateUserWithJWTClaim();
             if (response.errorMsg != null) return Unauthorized(new { message = "Invalid Token" });
-            return Ok(new { Id = response.id, Gender = response.Gender });
-
             var users = await userService.GetAllUsersAsync();
             if (users == null)
                 return BadRequest(new { message = "No user" });
@@ -73,6 +74,10 @@ namespace DatingApp.API.Controllers
         [Consumes("application/json")]
         public async Task<IActionResult> GetAsync([FromQuery] UserQueryParameters userQueryParameters)
         {
+            var response = HttpContext.ValidateUserWithJWTClaim();
+            if (response.errorMsg != null) return Unauthorized(new { message = "Invalid Token" });
+            userQueryParameters.Id = int.Parse(response.id);
+            userQueryParameters.loggedInUserGender = response.Gender;
             (IEnumerable<UserListDto> userLists, PagingMetadata data) result = await userService.GetAllUsersAsync(userQueryParameters);
             if (result.userLists == null)
                 return BadRequest(new { message = "No user" });
