@@ -12,6 +12,9 @@ namespace Shared.Infrastructure.DatabaseConnection
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
         public DbSet<User> Users { get; set; }
         public DbSet<Photo> Photos { get; set; }
+        public DbSet<Token> WebTokens { get; set; }
+
+
 
     }
 }

@@ -17,15 +17,15 @@ namespace Shared.Infrastructure.Repository
         {
             this.ctx = ctx;
         }
-        public DataContext GetDataContext => this.dataContext as DataContext;
+       // public DataContext GetDataContext => this.dataContext as DataContext;
 
         public void CreateUser(User user)
         {
-            GetDataContext.Add(user);
+            Create(user);
         }
         public void UpdateUser(User user)
         {
-            GetDataContext.Update(user);
+            Update(user);
         }
 
         public async Task<User> GetUserAsync(string username)

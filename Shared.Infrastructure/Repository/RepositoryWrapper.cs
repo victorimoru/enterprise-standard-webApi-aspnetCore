@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using Shared.Infrastructure.DatabaseConnection;
 using Shared.Infrastructure.LoggingHandler;
+using Shared.Infrastructure.Repository.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,6 +15,8 @@ namespace Shared.Infrastructure.Repository
     {
 
         private IUserRepository _user;
+        private ITokenRepository _token;
+
 
         private DataContext _ctx;
         private readonly ILoggerManager loggerManager;
@@ -32,6 +35,18 @@ namespace Shared.Infrastructure.Repository
                     _user = new UserRepository(_ctx);
                 }
                 return _user;
+            }
+        }
+
+        public ITokenRepository Token
+        {
+            get
+            {
+                if (_token == null)
+                {
+                    _token = new TokenRepository(_ctx);
+                }
+                return _token;
             }
         }
 

@@ -16,4 +16,23 @@ namespace DatingApp.Core.DTOs
     }
 
     public class UserLoginRquestDto : RegisterUserRquestDto { }
+
+    public class RefreshTokenRequestDto
+    {
+        
+        public string Token { get; set; }
+
+        public string RefreshToken { get; set; }
+
+    }
+
+    public class AuthenticationResponse
+    {
+        
+        public string Token { get; set; }
+        public string RefreshToken { get; set; }
+
+    }
+
+
 }

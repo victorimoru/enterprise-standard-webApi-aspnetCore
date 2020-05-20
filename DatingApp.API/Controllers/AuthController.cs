@@ -49,15 +49,35 @@ namespace DatingApp.API.Controllers
             if (!checkUsername)
                 return BadRequest(new { message = "User does not exist." });
 
-            var token = await authService.LoginAsync(userLoginRquestDto.Username.ToLower(), userLoginRquestDto.Password);
+            var authResponse = await authService.LoginAsync(userLoginRquestDto.Username.ToLower(), userLoginRquestDto.Password);
 
-            if (token == null)
+            if (authResponse.token == null && authResponse.refreshToken == null)
                 return Unauthorized(new { message = "Incorrect Password" });
 
-            return Ok(new { token = token });
+            return Ok(new AuthenticationResponse
+            {
+                Token = authResponse.token,
+                RefreshToken = authResponse.refreshToken
+            });
 
 
 
+        }
+
+        [HttpPost("refresh")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Consumes("application/json")]
+        public async System.Threading.Tasks.Task<IActionResult> RefreshTokenAsync(RefreshTokenRequestDto requestDto)
+        {
+            var result = await authService.RefreshTokenAsync(requestDto.Token, requestDto.RefreshToken);
+            if (!string.IsNullOrEmpty(result.ErrorMsg)) return BadRequest(new { message = result.ErrorMsg });
+            return Ok(new AuthenticationResponse
+            {
+                Token = result.Token,
+                RefreshToken = result.RefreshToken
+            });
         }
 
     }

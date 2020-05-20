@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.Linq;
+using System.Security.Claims;
 
 namespace DatingApp.API
 {
@@ -9,7 +10,7 @@ namespace DatingApp.API
         {
             if (httpContext.User == null) return ("Invalid", null, null);
             var UserId = httpContext.User.Claims.SingleOrDefault(x => x.Type == "Id").Value;
-            var Gender = httpContext.User.Claims.SingleOrDefault(x => x.Type == "Gender").Value;
+            var Gender = httpContext.User.Claims.SingleOrDefault(x => x.Type == ClaimTypes.Gender).Value;
             return (null, UserId, Gender);
             
         }
