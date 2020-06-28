@@ -16,9 +16,11 @@ namespace Shared.Infrastructure.Repository
 
         private IUserRepository _user;
         private ITokenRepository _token;
+        private ILikeRepository _like;
 
 
         private DataContext _ctx;
+       
         private readonly ILoggerManager loggerManager;
 
         public RepositoryWrapper(DataContext dataContext, ILoggerManager loggerManager)
@@ -47,6 +49,14 @@ namespace Shared.Infrastructure.Repository
                     _token = new TokenRepository(_ctx);
                 }
                 return _token;
+            }
+        }
+
+        public ILikeRepository Like
+        {
+            get
+            {
+                return _like ?? (_like = new LikeRepository(_ctx));
             }
         }
 

@@ -16,5 +16,7 @@ namespace DatingApp.Core.ServiceContracts
         Task<UserDetailsDto> GetUserDetailsAsync(int id);
         Task GetUserByIDAsync();
         Task<(string errorMsg, bool transactionStatus)> UpdateUserAsync(UserForUpdateDto userForUpdateDto, User user);
+        Task<Like> GetLike (int userId, int recipientId);
+        Task<Like> LikeUserAsync(int userId, int recipientId);
     }
 }

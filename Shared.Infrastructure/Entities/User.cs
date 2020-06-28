@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
 
 namespace Shared.Infrastructure.Entities
 {
@@ -25,6 +24,9 @@ namespace Shared.Infrastructure.Entities
         public string City { get; set; }
         public string Country { get; set; }
         public ICollection<Photo> PhotoSet { get; set; } = new HashSet<Photo>();
+        public ICollection<Like> Likers { get; set; } = new HashSet<Like>();
+        public ICollection<Like> Likees { get; set; } = new HashSet<Like>();
+
 
 
 

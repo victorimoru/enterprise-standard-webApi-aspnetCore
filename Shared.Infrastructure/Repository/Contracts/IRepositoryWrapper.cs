@@ -10,6 +10,8 @@ namespace Shared.Infrastructure.Repository
     {
         IUserRepository User { get; }
         ITokenRepository Token { get; }
+        ILikeRepository Like { get; }
+
         Task<(string errorMsg, bool transactionStatus)> Complete();
     }
 }

@@ -41,9 +41,9 @@ namespace DatingApp.Core.Services
             var accessToken = new Token()
             {
                 AccessToken = GenerateJSONWebToken(userInDB),
-                AccessTokenExpiry = DateTime.Now.AddMinutes(5),
+                AccessTokenExpiry = DateTime.Now.AddMinutes(60),
                 refreshToken = GuidGenerator.Generate(),
-                refreshTokenExpiry = DateTime.Now.AddMinutes(7),
+                refreshTokenExpiry = DateTime.Now.AddMinutes(65),
                 UserId = userInDB.Id
             };
             repositoryWrapper.Token.AddToken(accessToken);

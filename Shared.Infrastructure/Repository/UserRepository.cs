@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Shared.Infrastructure.DatabaseConnection;
 using Shared.Infrastructure.Entities;
+using Shared.Infrastructure.Extensions;
 using Shared.Infrastructure.PagingHelper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Shared.Infrastructure.Repository
@@ -30,19 +32,19 @@ namespace Shared.Infrastructure.Repository
 
         public async Task<User> GetUserAsync(string username)
         {
-            var user = await FindByCondition(u => u.Username == username).Include(p => p.PhotoSet).SingleOrDefaultAsync();
-            return user;
+            var user = Get(filter: f => f.Username == username).SingleOrDefaultAsync();
+            return await user;
         }
         public async Task<User> GetUserByIDAsync(int id, bool includePhoto = true)
         {
            if(includePhoto)
             {
-                var user = await FindByCondition(u => u.Id == id).Include(p => p.PhotoSet).SingleOrDefaultAsync();
+                var user = await Get(filter: u => u.Id == id, includeProperties: p => p.PhotoSet).SingleOrDefaultAsync();
                 return user;
             }
            else 
             {
-                var user = await FindByCondition(u => u.Id == id).SingleOrDefaultAsync();
+                var user = await Get(filter: u => u.Id == id).SingleOrDefaultAsync();
                 return user;
             }
             
@@ -50,14 +52,20 @@ namespace Shared.Infrastructure.Repository
 
         public async Task<PagedList<User>> GetUsersAsync(UserQueryParameters userQueryParameters)
         {
-            var query = FindAll().Include(p => p.PhotoSet).AsQueryable();
-            if ((string.IsNullOrEmpty(userQueryParameters.OrderBy) && userQueryParameters.OrderBy.ToLowerInvariant().Equals("username")))
+            var columnMap = new Dictionary<string, Expression<Func<User, object>>>
             {
-                query.OrderBy(x => x.Username);
-            }
-           
+                ["username"] = u => u.Username,
+                ["city"] = u => u.City,
+                ["id"] = u => u.Id,
+                ["country"] = u => u.Country,
+                ["lastActive"] = u => u.LastActive,
+            };
 
-            query = query.Where(x => x.Id != userQueryParameters.Id);
+           var  query = Get(includeProperties: new Expression<Func<User, object>> [] { p => p.PhotoSet } , filter: x => x.Id != userQueryParameters.Id);
+            
+            query = query.ApplyOrdering(userQueryParameters, columnMap);
+
+            var filterArray = new  List<Expression<Func<User, bool>>>();
 
             if (string.IsNullOrEmpty(userQueryParameters.gender))
             {
@@ -70,7 +78,9 @@ namespace Shared.Infrastructure.Repository
                 {
                     y = Gender.Female;
                 }
-                query = query.Where(x => x.Gender == y);
+              
+                filterArray.Add(x => x.Gender == y);
+              
             } 
             else
             {
@@ -83,7 +93,7 @@ namespace Shared.Infrastructure.Repository
                 {
                     y = Gender.Male;
                 }
-                query = query.Where(x => x.Gender == y);
+                filterArray.Add(x => x.Gender == y);
             }
 
             if( userQueryParameters.minAge != 18 || userQueryParameters.minAge != 99)
@@ -91,20 +101,24 @@ namespace Shared.Infrastructure.Repository
                 var minDob = DateTime.Today.AddYears(-userQueryParameters.maxAge - 1);
                 var maxDob = DateTime.Today.AddYears(-userQueryParameters.minAge);
 
-                query = query.Where(x => x.DateOfBirth >= minDob && x.DateOfBirth <= maxDob);
+                filterArray.Add(x => x.DateOfBirth >= minDob && x.DateOfBirth <= maxDob);
             }
 
-
+            query = query.ApplyFiltering(userQueryParameters, filterArray.ToArray());
             return await PagedList<User>.CreateAsync(query, userQueryParameters.PageNumber, userQueryParameters.PageSize);
         }
 
         public async Task<IEnumerable<User>> GetUsersAsync()
         {
-            var query = FindAll().Include(p => p.PhotoSet);
-            return await query.ToListAsync(); throw new System.NotImplementedException();
+            var query =  Get(includeProperties: p => p.PhotoSet);
+            return await query.ToListAsync();
         }
 
-        public bool UserExist(string username) => FindAll().Any(u => u.Username == username);
+        public bool UserExist(string username)
+        {
+            var x = Get(filter: u => u.Username == username).Any();
+            return x;
+        }
 
         /// <summary>
         /// Check if User table in the database is empty. 

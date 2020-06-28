@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NLog.Filters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,7 +43,7 @@ namespace Shared.Infrastructure.Repository
         }
 
        public virtual IQueryable<T> Get(Expression<Func<T, bool>> filter = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
-       string includeProperties = "")
+       params Expression<Func<T, object>>[] includeProperties)  
         {
             IQueryable<T> query = table;
 
@@ -53,11 +54,11 @@ namespace Shared.Infrastructure.Repository
 
             if (includeProperties != null)
             {
-                foreach (var includeProperty in includeProperties.Split
-                (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                foreach (var includeProperty in includeProperties)
                 {
                     query = query.Include(includeProperty);
                 }
+                
             }
 
 

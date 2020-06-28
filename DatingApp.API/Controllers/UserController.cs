@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Shared.Infrastructure.Entities;
 using Shared.Infrastructure.LoggingHandler;
 using Shared.Infrastructure.PagingHelper;
 using System.Collections.Generic;
@@ -36,7 +35,6 @@ namespace DatingApp.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserDetailsDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
 
-        [Consumes("application/json")]
         public async Task<IActionResult> GetAsync(int id)
         {
          
@@ -48,7 +46,7 @@ namespace DatingApp.API.Controllers
         }
 
         
-      
+        [AllowAnonymous]
         [HttpGet("all")]
         [Produces("application/json", "application/xml")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<UserListDto>))]
@@ -56,7 +54,7 @@ namespace DatingApp.API.Controllers
 
         public async Task<IActionResult> GetAsync([FromQuery] bool exclude = false)
         {
-            var response = HttpContext.ValidateUserWithJWTClaim();
+           var response = HttpContext.ValidateUserWithJWTClaim();
             if (response.errorMsg != null) return Unauthorized(new { message = "Invalid Token" });
             var users = await userService.GetAllUsersAsync();
             if (users == null)
@@ -81,10 +79,22 @@ namespace DatingApp.API.Controllers
             (IEnumerable<UserListDto> userLists, PagingMetadata data) result = await userService.GetAllUsersAsync(userQueryParameters);
             if (result.userLists == null)
                 return BadRequest(new { message = "No user" });
+
             HttpContext.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(result.data));
             HttpContext.Response.Headers.Add("X-Total-Count", result.data.TotalCount.ToString());
 
-            return Ok(result.userLists);
+            return Ok(new
+            {
+                data = result.userLists,
+                CurrentPage = result.data.CurrentPage,
+                TotalPages = result.data.TotalPages,
+                PageSize = result.data.PageSize,
+                TotalCount = result.data.TotalCount,
+                HasPrevious = result.data.HasPrevious,
+                HasNext = result.data.HasNext
+            });
+
+          //  return Ok(result.userLists);
 
         }
 
@@ -103,6 +113,24 @@ namespace DatingApp.API.Controllers
             {
                 return NoContent();
             }
+        }
+
+        [HttpPost("{id}/like/{recipientId}")]
+        public async Task<IActionResult> LikeUser(int id, int recipientId)
+        {
+            var response = HttpContext.ValidateUserWithJWTClaim();
+            if (response.errorMsg != null) return Unauthorized(new { message = "Invalid Token" });
+
+            var checkIfLikeAlreadtExist = await userService.GetLike(id, recipientId);
+            if (checkIfLikeAlreadtExist != null) return BadRequest(new { message = "You already liked the user." });
+
+            var recipientUserInDB = await userService.GetUserByIDAsync(recipientId, false);
+            if (recipientUserInDB == null) return NotFound();
+
+            var likeResponse = await userService.LikeUserAsync(id, recipientUserInDB.Id);
+            if(likeResponse == null) return BadRequest(new { message = "Error occured while creating like" });
+
+            return Ok(new { ResponseCode = "00", ResponseDescription = "Like created Successfully" });
         }
     }
 }

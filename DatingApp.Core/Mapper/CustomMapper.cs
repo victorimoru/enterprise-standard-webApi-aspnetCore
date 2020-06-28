@@ -55,7 +55,7 @@ namespace DatingApp.Core.Mapper
                               Country = u.Country,
                               Gender = u.Gender == Gender.Male ? "Male" : "Female",
                               photoUrl = u.PhotoSet.FirstOrDefault(x => x.IsMain).Url
-                          }).OrderBy(a => a.Id).ToList();
+                          }).ToList();
 
             return result;
         }

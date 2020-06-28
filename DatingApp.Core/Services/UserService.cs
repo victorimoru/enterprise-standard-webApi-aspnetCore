@@ -48,9 +48,11 @@ namespace DatingApp.Core.Services
 
         }
 
+        public async Task<Like> GetLike(int userId, int recipientId) => await repositoryWrapper.Like.GetLike(userId, recipientId);
+
         public Task<User> GetUserByIDAsync(int id, bool includePhoto = true)
-        {
-            var userInDB = repositoryWrapper.User.GetUserByIDAsync(id, includePhoto);
+        { 
+           var userInDB = repositoryWrapper.User.GetUserByIDAsync(id, includePhoto);
             return userInDB;
         }
 
@@ -65,6 +67,25 @@ namespace DatingApp.Core.Services
             
             return (user == null) ? null : customMapper.MapToUserDetailsDto(user);
 
+        }
+
+        public async Task<Like> LikeUserAsync(int userId, int recipientId)
+        {
+            
+            var like = new Like
+            {
+                LikerId = userId,
+                LikeeId = recipientId
+            };
+            repositoryWrapper.Like.CreateLike(like);
+            var saveStatus = await repositoryWrapper.Complete();
+            switch (saveStatus.transactionStatus)
+            {
+                case false:
+                    return null;
+                default:
+                    return like;
+            }
         }
 
         public async Task<(string errorMsg, bool transactionStatus)> UpdateUserAsync(UserForUpdateDto userForUpdateDto, User user)
